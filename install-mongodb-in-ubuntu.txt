@@ -1,0 +1,10 @@
+1. sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
+
+2.a) 12.04 - echo "deb http://repo.mongodb.org/apt/ubuntu precise/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
+  b)14.04 - echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
+  c)16.04 - echo "deb http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
+  
+3. sudo apt-get update
+
+4. sudo apt-get install -y mongodb-org
+
