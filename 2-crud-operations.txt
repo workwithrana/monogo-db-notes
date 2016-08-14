@@ -66,8 +66,16 @@ Existence Check
 db.users.find( { name : { $exists: false } } )
 
 
+$regex
+------
+db.users.find({"name": /.*m.*/})
+db.collection.find( { field: /acme.*corp/i } );
+db.collection.find( { field: { $regex: 'acme.*corp', $options: 'i' } } );
 
-
+Distinct
+---------
+db.class.distinct("age")
+db.runCommand({distinct : "class", key: "age", query: {subject : "MongoDB"}})
 
 2. Insert Document:
 
@@ -127,6 +135,12 @@ db.users.update(
    }
 )
 
+db.inventory.update(
+	{ type: "book", item : "journal" },
+	{ $set : { qty: 10 } },
+	{ upsert : true }
+)
+
 Update Many
 -----------
 db.users.updateMany(
@@ -157,6 +171,84 @@ db.users.update(
    { name: "xyz" },
    { name: "mee", age: 25, type: 1, status: "A", favorites: { "artist": "Matisse", food: "mango" } }
 )
+
+$unset
+db.users.update(
+	{ },
+	{ $unset: { join_date: "" } },
+	{ multi: true }
+)
+
+$inc - to increment field
+---------------------------
+db.users.update(
+	{ status: "A" } ,
+	{ $inc: { age: 3 } },
+	{ multi: true }
+)
+
+$push / $pushAll
+----------------
+db.test.update({}, {$push : {<arr> : <value>}})
+db.survey.update( { _id: 1 }, { $pushAll: { scores: [ 0, 5 ] } } )
+
+$push with $each/$sort/$slice
+-----------------------------
+{
+   "_id" : 5,
+   "quizzes" : [
+                  { wk: 1, "score" : 10 },
+                  { wk: 2, "score" : 8 },
+                  { wk: 3, "score" : 5 },
+                  { wk: 4, "score" : 6 }
+               ]
+}
+
+db.students.update( { _id: 5 },
+                    { $push: { quizzes: { $each: [ { wk: 5, score: 8 },
+                                                   { wk: 6, score: 7 },
+                                                   { wk: 7, score: 6 } ],
+                                          $sort: { score: -1 },
+                                          $slice: 3
+                                        }
+                             }
+                    }
+                  )
+db.survey.update( { _id: 1 },
+                    { $push: { quiz: { $each: [ { wk: 1, score: 10 },
+                                                   { wk: 3, score: 9 },
+                                                   { wk: 6, score: 15 } ],
+                                          $sort: { score: -1 }
+                                        }
+                             }
+                    }
+                  )
+
+
+$pull / $pullAll
+----------------
+db.accounts.update({}, {$pull: {<arr>: <value>}})
+db.profiles.update( { _id: 1 }, { $pull: { votes: { $gte: 6 } } } )
+db.survey.update( { _id: 1 }, { $pullAll: { scores: [ 0, 5 ] } } )
+
+$addToSet
+---------
+-- Checks unique
+{ _id: 1, item: "filter", tags: [ "electronics", "camera" ] }
+db.inventory.update(
+                     { _id: 1 },
+                     { $addToSet: { tags: "accessories"  } }
+                   )
+
+
+
+Write Concern
+--------------
+db.class.insert(st,{ writeConcern: { w:0 } })
+
+Journal
+-------
+--journalCommitInterval 200
 
 4. Delete Document
 
