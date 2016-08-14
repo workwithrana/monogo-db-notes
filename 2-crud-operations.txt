@@ -59,6 +59,7 @@ Combination of fields satisfy - db.users.find( { "points.points": { $lte: 70 }, 
 Project Specific Array Elements in the Returned Array
 -----------------------------------------------------
 db.users.find( { status: "A" }, { name: 1, status: 1, points: { $slice: -1 } } )
+db.users.find( { status: "A" }, { name: 1, status: 1, points: { $elemMatch: { points: { $lte: 70 }, bonus: 20 }} } )
 
 Existence Check
 ---------------
