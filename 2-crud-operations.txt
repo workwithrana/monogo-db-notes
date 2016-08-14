@@ -107,3 +107,114 @@ db.users.insertMany(
    ]
 )
 
+3. Update Document
+
+Update one
+----------
+db.users.updateOne(
+   { "favorites.artist": "Picasso" },
+   {
+     $set: { "favorites.food": "pie", type: 3 },
+     $currentDate: { lastModified: true }
+   }
+)
+
+db.users.update(
+   { "favorites.artist": "Pisanello" },
+   {
+     $set: { "favorites.food": "pizza", type: 0,  },
+     $currentDate: { lastModified: true }
+   }
+)
+
+Update Many
+-----------
+db.users.updateMany(
+   { "favorites.artist": "Picasso" },
+   {
+     $set: { "favorites.artist": "Pisanello", type: 3 },
+     $currentDate: { lastModified: true }
+   }
+)
+
+db.users.update(
+   { "favorites.artist": "Pisanello" },
+   {
+     $set: { "favorites.food": "pizza", type: 0,  },
+     $currentDate: { lastModified: true }
+   },
+   { multi: true }
+)
+
+Replace one
+-----------
+db.users.replaceOne(
+   { name: "abc" },
+   { name: "amy", age: 34, type: 2, status: "P", favorites: { "artist": "Dali", food: "donuts" } }
+)
+
+db.users.update(
+   { name: "xyz" },
+   { name: "mee", age: 25, type: 1, status: "A", favorites: { "artist": "Matisse", food: "mango" } }
+)
+
+4. Delete Document
+
+Delete Many
+-----------
+Remove all - db.users.remove({})
+db.users.deleteMany({})
+
+db.users.deleteMany({ status : "A" })
+db.users.remove( { status : "P" } )
+
+Delete One
+----------
+db.users.deleteOne( { status: "D" } )
+db.users.remove( { status: "D" }, 1)
+
+5. Bulk Write Operation
+
+db.characters.insertMany([
+{ "_id" : 1, "char" : "Brisbane", "class" : "monk", "lvl" : 4 }, 
+{ "_id" : 2, "char" : "Eldon", "class" : "alchemist", "lvl" : 3 }, 
+{ "_id" : 3, "char" : "Meldane", "class" : "ranger", "lvl" : 3 }
+])
+
+db.characters.bulkWrite(
+      [
+         { insertOne :
+            {
+               "document" :
+               {
+                  "_id" : 4, "char" : "Dithras", "class" : "barbarian", "lvl" : 4
+               }
+            }
+         },
+         { insertOne :
+            {
+               "document" :
+               {
+                  "_id" : 5, "char" : "Taeln", "class" : "fighter", "lvl" : 3
+               }
+            }
+         },
+         { updateOne :
+            {
+               "filter" : { "char" : "Eldon" },
+               "update" : { $set : { "status" : "Critical Injury" } }
+            }
+         },
+         { deleteOne :
+            { "filter" : { "char" : "Brisbane"} }
+         },
+         { replaceOne :
+            {
+               "filter" : { "char" : "Meldane" },
+               "replacement" : { "char" : "Tanys", "class" : "oracle", "lvl" : 4 }
+            }
+         }
+      ]
+   );
+   
+
