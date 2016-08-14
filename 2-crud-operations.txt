@@ -1,4 +1,67 @@
-1. Insert Document:
+1. Query Document:
+
+Find All
+--------
+db.users.find()
+
+Find with equality - db.users.find( { status: "A" } )
+$in operator - db.users.find( { status: { $in: [ "P", "D" ] } } )
+AND operator - db.users.find( { status: "A", age: { $lt: 30 } } )
+
+$or operator 
+------------
+db.users.find(
+   {
+     $or: [ { status: "A" }, { age: { $lt: 30 } } ]
+   }
+)
+
+AND & OR
+--------
+db.users.find(
+   {
+     status: "A",
+     $or: [ { age: { $lt: 30 } }, { type: 1 } ]
+   }
+)
+
+Query on Embeded Document
+-------------------------
+Exact Match - db.users.find( { favorites: { artist: "Picasso", food: "pizza" } } )
+
+Equality - db.users.find( { "favorites.artist": "Picasso" } )
+
+Query on Array
+--------------
+Exact Match - db.users.find( { badges: [ "blue", "black" ] } )
+
+Match an element - db.users.find( { badges: "black" } )
+
+Match a specific element - db.users.find( { "badges.0": "black" } )
+
+Specify multiple criteria on array 
+-----------------------------------------------
+Single element satisfies - db.users.find( { finished: { $elemMatch: { $gt: 15, $lt: 20 } } } )
+Combination of element satisfies - db.users.find( { finished: { $gt: 15, $lt: 20 } } )
+
+Array of Embeded document
+-------------------------
+Query by array index - db.users.find( { 'points.0.points': { $lte: 55 } } )
+
+Query without index - db.users.find( { 'points.points': { $lte: 55 } } )
+
+Multiple criteris in Array of Documents
+----------------------------------------
+Single field satiesfies - db.users.find( { points: { $elemMatch: { points: { $lte: 70 }, bonus: 20 } } } )
+Combination of fields satisfy - db.users.find( { "points.points": { $lte: 70 }, "points.bonus": 20 } )
+
+
+db.users.find( { points: { $elemMatch: { points: { $lte: 70 }, bonus: 20 } } } )
+
+
+
+
+2. Insert Document:
 
 Insert One
 ----------
