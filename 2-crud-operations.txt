@@ -1,0 +1,38 @@
+1. Insert Document:
+
+Insert One
+----------
+db.users.insert(
+   {
+      name: "sue",
+      age: 19,
+      status: "P"
+   }
+)
+
+db.users.insertOne(
+   {
+      name: "sue",
+      age: 19,
+      status: "P"
+   }
+)
+
+Insert Many
+-----------
+db.users.insert(
+   [
+     { name: "bob", age: 42, status: "A", },
+     { name: "ahn", age: 22, status: "A", },
+     { name: "xi", age: 34, status: "D", }
+   ]
+)
+
+db.users.insertMany(
+   [
+     { name: "bob", age: 42, status: "A", },
+     { name: "ahn", age: 22, status: "A", },
+     { name: "xi", age: 34, status: "D", }
+   ]
+)
+
