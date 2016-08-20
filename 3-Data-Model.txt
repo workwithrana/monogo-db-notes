@@ -1,0 +1,135 @@
+1.	Model Tree Structures with Parent References
+	Presents a data model that organizes documents in a tree-like structure by storing references to 
+	“parent” nodes in “child” nodes.
+
+{ 
+_id: "Countries", 
+parent: null 
+}
+
+
+db.country.insert( { _id: "Countries", parent: null } );
+db.country.insert( { _id: "India", parent: "Countries" } );
+db.country.insert( { _id: "Pakistan", parent: "Countries" } );
+db.country.insert( { _id: "US", parent: "Countries" } );
+db.country.insert( { _id: "China", parent: "Countries" } );
+db.country.insert( { _id: "Karnataka", parent: "India" } );
+db.country.insert( { _id: "Andhra", parent: "India" } );
+db.country.insert( { _id: "Lahore", parent: "Pakistan" } );
+db.country.insert( { _id: "Punjab", parent: "Pakistan" } );
+db.country.insert( { _id: "CA", parent: "US" } );
+db.country.insert( { _id: "AZ", parent: "US" } );
+db.country.insert( { _id: "Chugo", parent: "China" } );
+db.country.insert( { _id: "Digo", parent: "China" } );
+
+
+db.country.findOne( { _id: "Pakistan" } ).parent
+db.country.ensureIndex( { parent: 1 } )
+db.country.find( { parent: "China" } )
+
+
+2.	Model Tree Structures with Child References
+	Presents a data model that organizes documents in a tree-like structure by storing references to 
+	“child” nodes in “parent” nodes.
+
+2.	Model Tree Structures with Child References
+
+db.country1.insert( { _id: "Andhra", children: [] } );
+db.country1.insert( { _id: "Karnataka", children: [] } );
+db.country1.insert( { _id: "Digo", children: [ ] } );
+db.country1.insert( { _id: "Chugo", children: [ ] } );
+db.country1.insert( { _id: "Lahore", children: [ ] } );
+db.country1.insert( { _id: "Punjab", children: [ ] } );
+db.country1.insert( { _id: "CA", children: [ ] } );
+db.country1.insert( { _id: "AZ", children: [ ] } );
+
+db.country1.insert( { _id: "India", children: [ "Karnataka", "Andhra" ] } );
+db.country1.insert( { _id: "China", children: [ "Digo", "Chugo" ] } );
+db.country1.insert( { _id: "Pakistan", children: [ "Lahore", "Punjab" ] } );
+db.country1.insert( { _id: "US", children: [ "CA", "AZ" ] } );
+
+db.country1.insert( { _id: "Countries", children: ["India","Pakistan","US","China"] } );
+
+
+db.country1.findOne( { _id: "Countries" } ).children;
+db.country1.ensureIndex( { children: 1 } );
+db.country1.find( { children: "US" } );
+
+
+
+3.	Model Tree Structures with an Array of Ancestors
+	Presents a data model that organizes documents in a tree-like structure by storing references to 
+	“parent” nodes and an array that stores all ancestors.
+
+The Array of Ancestors pattern stores each tree node in a document; 
+in addition to the tree node, document stores in an array the id(s) of the node’s ancestors or path.
+
+
+The following example models the tree using Array of Ancestors. 
+In addition to the ancestors field, these documents also store the reference to the 
+immediate parent category in the parent field:
+
+
+
+db.country2.insert( { _id: "Andhra", ancestors: [ "country", "India" ], parent: "India" } );
+db.country2.insert( { _id: "Karnataka", ancestors: [  "country", "India" ], parent: "India" } );
+db.country2.insert( { _id: "Chugo", ancestors: [ "country", "china" ], parent: "china" } );
+db.country2.insert( { _id: "digo", ancestors: [ "country", "china" ], parent: "china" } );
+db.country2.insert( { _id: "Lahore", ancestors: [ "country","Pakistan" ], parent: "Pakistan" } );
+db.country2.insert( { _id: "Punjab", ancestors: [ "country","Pakistan" ], parent: "Pakistan" } );
+db.country2.insert( { _id: "CA", ancestors: ["country","US" ], parent: "US" } );
+db.country2.insert( { _id: "AG", ancestors: ["country","US" ], parent: "US" } );
+
+db.country2.insert( { _id: "India", ancestors: ["country"], parent: "Country" } );
+db.country2.insert( { _id: "China", ancestors: ["country"], parent: "Country" } );
+db.country2.insert( { _id: "Pakistan", ancestors: ["country"], parent: "Country" } );
+db.country2.insert( { _id: "US", ancestors: ["country"], parent: "Country" } );
+
+
+
+db.country2.findOne( { _id: "AG" } ).ancestors;
+db.country2.ensureIndex( { ancestors: 1 } );
+db.country2.find( { ancestors: "Pakistan" } );
+
+
+======================================================
+
+Model data of Atomic Operations
+-------------------------------
+{
+	_id: 123456789,
+	title: "MongoDB: The Definitive Guide",
+	author: [ "Kristina Chodorow", "Mike Dirolf" ],
+	published_date: ISODate("2010-09-24"),
+	pages: 216,
+	language: "English",
+	publisher_id: "oreilly",
+	available: 3,
+	checkout: [ { by: "joe", date: ISODate("2012-10-15") } ]
+}
+
+db.books.findAndModify ( {
+	query: {
+		_id: 123456789,
+		available: { $gt: 0 }
+	},
+	update: {
+		$inc: { available: -1 },
+		$push: { checkout: { by: "Diana", date: new Date() } }
+	}
+} )
+
+
+Model data to support key word search
+------------------------------------
+{ 
+	title : "Moby-Dick" ,
+	author : "Herman Melville" ,
+	published : 1851 ,
+	ISBN : 0451526996 ,
+	topics : [ "whaling" , "allegory" , "revenge" , "American" ,"novel" , "nautical" , "voyage" , "Cape Cod" ]
+}
+
+db.volumes.ensureIndex( { topics: 1 } )
+db.volumes.findOne( { topics : "voyage" }, { title: 1 } )
+db.volumes.findOne( { title : "Moby"})
