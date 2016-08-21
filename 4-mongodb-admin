@@ -16,7 +16,7 @@ Backup using copying the data dir - simply copy the dbpath
 Monitoring
 -----------
 db.serverStatus()
-db.runCommand( { serverStatus: 1, workingSet: 1, metrics: 0, locks: 0 } )
+db.runCommand( { serverStatus: 1, workingSet: 1, metrics: 0, locks: 0, tcmalloc : 0, wiredTiger : 0 } )
 
 db.stats()
 --------
