@@ -1,7 +1,7 @@
 Backup
 -------
 mongodump
-mongodump --dbpath D:\Rana2\custom_data -o D:\Rana2\custom_data\dump - server is not running
+mongodump --dbpath D:\Rana2\custom_data -o D:\Rana2\custom_data\dump - server is not running (not present - deprecated)
 mongodump --host localhost --port 30000
 mongodump --collection collection --db test
 
@@ -9,7 +9,7 @@ Restore
 -------
 mongorestore dump
 mongorestore --host localhost --port 30000 dump
-mongorestore --dbpath D:\Rana2\custom_data D:\Rana2\custom_data\dump - server is not running
+mongorestore --dbpath D:\Rana2\custom_data D:\Rana2\custom_data\dump - server is not running - deprecated
 
 Backup using copying the data dir - simply copy the dbpath
 
@@ -256,7 +256,7 @@ show profile
 Export/Import
 -------------
 mongoexport.exe --collection class --db foo -o D:\Rana2\class.json
-mongoexport.exe --collection class --db foo --csv -f _id,name,age,subject -o D:\Rana2\class.csv
+mongoexport.exe --collection class --db foo --type=csv -f _id,name,age,subject -o D:\Rana2\class.csv
 
 mongoimport.exe --db test --collection class < D:\Rana2\class.json
 
