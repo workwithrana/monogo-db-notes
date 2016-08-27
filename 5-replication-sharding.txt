@@ -22,8 +22,6 @@ cfg.members[0].priority = 0 -- create a priority 0 member
 rs.reconfig(cfg) - reconfigure the replica set
 
 
-
-
 Write Concern - at the DB level
 -------------------------------
  db.getWriteConcern()
@@ -88,3 +86,17 @@ db.oplog.rs.save( db.temp.findOne() )
 Restart
 mongod --replSet rs0 --dbpath /srv/mongodb
 
+
+
+Set up Sharding
+---------------
+
+1. Create replica set as described above with sample conf as below
+replSet=rs1
+oplogSize=128
+shardsvr=true
+
+2. Run mongod for config db with sample conf as below
+configsvr=true
+
+3. Start mongos with the config server
