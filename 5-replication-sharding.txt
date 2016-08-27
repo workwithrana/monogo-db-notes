@@ -1,3 +1,29 @@
+Set up replciation:
+------------------
+
+sample conf
+-----------
+replSet=rs1
+oplogSize=128
+
+- Login to one node
+- rs.initiate()
+- rs.add("host:port")
+- rs.addArb("host:port")
+
+Check replica set status
+-----------------------
+rs.status()
+
+Reconfigure replica set
+-----------------------
+var cfg = rs.conf()
+cfg.members[0].priority = 0 -- create a priority 0 member
+rs.reconfig(cfg) - reconfigure the replica set
+
+
+
+
 Write Concern - at the DB level
 -------------------------------
  db.getWriteConcern()
