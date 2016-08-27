@@ -92,11 +92,45 @@ Set up Sharding
 ---------------
 
 1. Create replica set as described above with sample conf as below
-replSet=rs1
+dbpath=/home/vagrant/shData/db4
+logpath=/home/vagrant/log/mongo4.log
+logappend=true
+port=30004
+replSet=rsEdureka2
 oplogSize=128
 shardsvr=true
+fork=true
 
 2. Run mongod for config db with sample conf as below
+dbpath=/home/vagrant/shData/db8
+logpath=/home/vagrant/log/mongo8.log
+logappend=true
+port=30008
 configsvr=true
+fork=true
 
-3. Start mongos with the config server
+3. Start mongos with the following conf
+logpath=/home/vagrant/log/mongos.log
+logappend=true
+port=30000
+configdb=precise64:30007,precise64:30008,precise64:30009
+fork=true
+
+4. Login to mongos using mongo client
+5. Configure shard 
+sh.addShard("rsEdureka1/precise64:30001,precise64:30002,precise64:30003")
+sh.addShard("rsEdureka2/precise64:30004,precise64:30005,precise64:30006")
+
+6. Enable sharding
+sh.enableSharding("shrd")
+use shrd
+db.foo.ensureIndex({userId : 1})
+sh.shardCollection("shrd.foo", {userId : 1})
+
+7. Load data
+for(var i=0; i<10000; i++) {db.foo.insert({name : 'name-'+i, userId : i})}
+db.foo.findOne()
+db.foo.find({name : "name-1000"}).pretty()
+db.foo.find({name : "name-1000"}).explain()
+db.foo.find({userId : 1000})
+db.foo.find({userId : 1000}).explain()
