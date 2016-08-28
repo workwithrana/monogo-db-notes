@@ -1,0 +1,113 @@
+Step1: 
+
+Download the data from the MongoDB site, refer the below URL "http://media.mongodb.org/zips.json"
+
+Step2:
+
+Load the data with mongoimport utility. In below statement I have given database name as zips
+
+mongoimport -d edureka  -c zips --ignoreBlanks --drop --type json --file "C:\Users\USER\Desktop\MongoDBClasses\zips.json"
+
+Aggregation Pipeline:
+--------------------
+Group by - sum
+
+db.zips.aggregate( { $group :
+                         { _id : "$state",
+                           totalPop : { $sum : "$pop" } } },
+                       { $match : {totalPop : { $gte : 10000000} } } )
+
+
+Return Average City Population by State:
+
+db.zips.aggregate( { $group :
+                         { _id : { state : "$state", city : "$city" },
+                           pop : { $sum : "$pop" } } },
+                       { $group :
+                       { _id : "$_id.state",
+                         avgCityPop : { $avg : "$pop" } } } )
+
+Match-Group-Project-Sort-Skip-Limit
+------------------------------------
+db.zips.aggregate([
+    {$match:
+     {
+	 state:"NY"
+     }
+    },
+    {$group:
+     {
+	 _id: "$city",
+	 population: {$sum:"$pop"},
+     }
+    },
+    {$project:
+     {
+	 _id: 0,
+	 city: "$_id",
+	 population: 1,
+     }
+    },
+    {$sort:
+     {
+	 population:-1
+     }
+    },
+    {$skip: 10},
+    {$limit: 5}
+])
+
+
+MapReduce
+---------
+
+db.books.insertMany(
+  [
+  {name : "Understanding JAVA", pages : 100},
+  {name : "Understanding XML", pages : 300},
+  {name : "Understanding XML", pages : 300},
+  {name : "Understanding Web Services", pages : 400},
+  {name : "Understanding Axis2", pages : 150}
+  ]
+)
+
+Map Function
+------------
+var map = function() {
+	var category;
+	if ( this.pages >= 250 )
+	category = 'Big Books';
+	else
+	category = "Small Books";
+	emit(category, {name: this.name});
+};
+
+Reduce Function
+---------------
+var reduce = function(key, values) {
+	var sum = 0;
+	values.forEach(function(doc) {
+		sum += 1;
+	});
+	return {books: sum};
+};
+
+db.books.mapReduce(map, reduce, {out: "book_results"});
+
+Single Purpose Aggregation:
+---------------------------
+Count, Distinct Group
+
+db.records.group( {
+   key: { a: 1 },
+   cond: { a: { $lt: 3 } },
+   reduce: function(cur, result) { result.count += cur.count },
+   initial: { count: 0 }
+} );
+
+db.zips.group( {
+   key: { state: 1 },
+   cond: { pop: { $lte: 6055 } },
+   reduce: function(cur, result) { result.count += cur.pop },
+   initial: { count: 0 }
+} );
