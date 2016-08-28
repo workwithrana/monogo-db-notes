@@ -6,7 +6,7 @@ Step2:
 
 Load the data with mongoimport utility. In below statement I have given database name as zips
 
-mongoimport -d edureka  -c zips --ignoreBlanks --drop --type json --file "C:\Users\USER\Desktop\MongoDBClasses\zips.json"
+mongoimport -d edureka  -c zips --drop < "C:\Users\USER\Desktop\MongoDBClasses\zips.json"
 
 Aggregation Pipeline:
 --------------------
