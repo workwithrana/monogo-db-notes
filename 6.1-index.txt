@@ -122,37 +122,27 @@ GeometryCollection -
 
 2dsphere Index
 --------------
-db.places.insert(
+db.places.insertMany([
 	{
 		loc : { type: "Point", coordinates: [ -73.97, 40.77 ] },
 		name: "Central Park",
 		category : "Parks"
-	}
-)
-
-db.places.insert(
+	},
 	{
 		loc : { type: "Point", coordinates: [ -73.88, 40.78 ] },
 		name: "La Guardia Airport",
 		category : "Airport"
-	}
-)
-
-db.places.insert(
+	},
 	{
 		loc : { type: "Point", coordinates: [ -70, 43 ] },
 		name: "Eliot Park",
 		category : "Park"
-	}
-)
-
-
-db.places.insert(
+	},
 	{
 		loc : { type: "Point", coordinates: [ -67, 39 ] },
 		name: "Fortis",
 		category : "Hospital"
-	}
+	}]
 )
 
 
@@ -234,6 +224,16 @@ error.
 
 db.collection.ensureIndex( { <location field> : "2d" } ,{ min : <lower bound> , max : <upper bound> } )
 
+db.coord.insertMany([
+	{ "_id" : 1, "loc" : [ 1, 2 ] }
+	{ "_id" : 2, "loc" : [ 1, 1 ] }
+	{ "_id" : 3, "loc" : [ 1, 3 ] }
+	{ "_id" : 4, "loc" : [ 2, 1 ] }
+	{ "_id" : 5, "loc" : [ 0, 0 ] }
+	{ "_id" : 6, "loc" : [ 5, 5 ] }
+])
+
+
 Points within a Shape Defined on a Flat Surface
 -----------------------------------------------
 To select all legacy coordinate pairs found within a given shape on a flat surface, use the $geoWithin operator along
@@ -258,6 +258,13 @@ db.coord.find( { loc :
 	} 
 	} 
 )
+
+db.coord.find( { loc :
+                  { $geoWithin :
+                    { $geometry :
+                      { type : "Polygon" ,
+                        coordinates: [ [ [ 0 , 0 ] , [ 0 , 4 ] , [ 4 , 4 ] , [ 0 , 0 ] ] ]
+                } } } } )
 
 The following queries for documents that are within the circle centered on [ -74 , 40.74 ] and with a radius of
 10:
