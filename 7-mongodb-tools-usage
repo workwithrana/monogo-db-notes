@@ -44,3 +44,30 @@ mongofiles -d record search corinth
 
 fs.chunks - actual binary data
 fs.files - metadata
+
+----------------------------------------------------------------------
+HTTP Interface
+--------------
+To get the contents of a collection (note the trailing slash):
+http://127.0.0.1:28017/databaseName/collectionName/
+
+To add a limit:
+http://127.0.0.1:28017/databaseName/collectionName/?limit=-10
+
+To skip:
+http://127.0.0.1:28017/databaseName/collectionName/?skip=5
+
+To query for {a : 1}:
+http://127.0.0.1:28017/databaseName/collectionName/?filter_a=1
+
+Separate conditions with an &:
+http://127.0.0.1:28017/databaseName/collectionName/?filter_a=1&limit=-10
+
+Same as db.$cmd.findOne({listDatabase:1}) on the admin database in the shell:
+http://localhost:28017/admin/$cmd/?filter_listDatabases=1&limit=1
+
+To count documents in a collection:
+http://host:port/db/$cmd/?filter_count=collection&limit=1
+
+-------------------------------------------------------------------------
+
