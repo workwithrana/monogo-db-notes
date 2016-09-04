@@ -1,4 +1,46 @@
 MongoDB Tools and Usage
 ------------------------
-bsondump:
+bsondump
+--------
 bsondump.exe D:\Rana2\backdb\dms\topic.bson --pretty
+
+mongooplog -- load oplog from one server to another -- deprecated
+----------
+mongooplog  --from mongodb0.example.net --host mongodb1.example.net
+
+mongoperf
+--------
+mongoperf < jsonconfigfile
+
+{
+  nThreads:16, // number of threads to run the test
+  fileSizeMB:1, // test file size
+  mmf : false, // set to true if want to test memory mapped files
+  sleepMicros : 0, // mongoperf will pause for the number of specified sleepMicros divided by the nThreads between each operation
+  r:true, // to include read operation in the test
+  w:true, // to include write operation in the test
+  recSizeKB:4, // byte size of each write operation
+  syncDelay: 0 // Seconds between disk flushes. mongoperf.syncDelay is similar to --syncdelay for mongod.
+  //Only use syncDelay in conjunction with mmf set to true
+}
+
+mongofiles and GridFS
+---------------------
+mongofiles <options> <commands> <filename>
+
+-- to load files using GridFS
+mongofiles.exe -d record put mongodb-limits-and-thresholds.pdf
+
+mongofiles.exe -d record put limitation.pdf -l "D:\Rana2\02. Edureka\MongoDB\Class7\mongodb-limits-and-thresholds.pdf"
+
+-- to list the saved files
+mongofiles.exe -d record list
+
+-- to get the file
+mongofiles.exe -d record -l D:\Rana2\mongodb.pdf get mongodb.pdf
+
+-- to search
+mongofiles -d record search corinth
+
+fs.chunks - actual binary data
+fs.files - metadata
