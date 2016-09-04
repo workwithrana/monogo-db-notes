@@ -1,0 +1,4 @@
+MongoDB Tools and Usage
+------------------------
+bsondump:
+bsondump.exe D:\Rana2\backdb\dms\topic.bson --pretty
