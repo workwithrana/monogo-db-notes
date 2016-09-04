@@ -71,3 +71,70 @@ http://host:port/db/$cmd/?filter_count=collection&limit=1
 
 -------------------------------------------------------------------------
 
+Jasper Query
+------------
+-- Select all
+{
+    'collectionName' : 'accounts'
+}
+
+-- Specify the fields returned and sort the results
+{
+    'collectionName' : 'accounts',
+    'findFields' : {
+        'name':1,
+		'address.zip':1,
+        'phone_office':1,
+        'billing_address_city':1,
+        'billing_address_street':1,
+        'billing_address_country':1
+    },
+    'sort' : {
+        'billing_address_country':-1,
+        'billing_address_city':1
+    }
+}
+
+-- Filtered and parameterized
+{
+     'collectionName' : 'accounts',
+     'findQuery' : {
+          'status_date' : { '$gte' : $P{StartDate}, $lt: $P{EndDate} },
+          'name' : { '$regex' : '^N', '$options' : '' }
+ 
+      }
+}
+
+-- $in clause
+{
+    'collectionName' : 'customers',
+     'findQuery' : { 'industry' : { '$in' : ['Communications','Engineering'] } }
+}
+
+-- map reduce
+{
+     'collectionName' : 'customers',
+     'findQuery' : { 'industry' : { '$in' : $P{MyCollectionParameter} } }
+}
+
+-- aggregation
+{
+   runCommand: {
+        aggregate : 'zips',
+        pipeline : [
+                {
+                        $group : {
+                                _id : '$state',
+                                population: {
+                                        $sum : '$pop'
+                                }
+                        }
+                },
+                {
+                        $sort : {
+                                population : -1
+                        }
+                }
+        ]
+}
+
