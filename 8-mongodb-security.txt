@@ -1,0 +1,303 @@
+Security
+--------
+Network Exposure and Security : --nohttpinterface --bind_ip --port
+mongod.exe --dbpath D:\Rana2\sec_data --auth
+
+
+Add a user in a database
+------------------------
+-- Create the system user administrator
+
+use admin
+db.createUser(
+{
+	user: "siteUserAdmin",
+	pwd: "password",
+	roles: [{
+		role: "userAdminAnyDatabase",
+		db: "admin"
+	}]
+}
+)
+
+-- Create a user administrator for a single database
+use reporting
+db.createUser(
+{
+	user: "reportsUserAdmin",
+	pwd: "password",
+	roles: [{
+		role: "userAdmin",
+		db: "reporting"
+	}]
+}
+)
+
+-- Verify privilege
+db.runCommand(
+{
+	usersInfo: "recordsUserAdmin",
+	showPrivileges: true
+}
+)
+
+-- Create the new user
+use reporting
+db.createUser(
+{
+	user: "reportsUser",
+	pwd: "12345678",
+	roles: [{
+		role: "read",db: "reporting"
+	}]
+}
+)
+
+use reporting
+db.createUser(
+{
+	user: "reportsUser",
+	pwd: "12345678",
+	roles: [{
+		role: "read",db: "reporting"
+	},
+	{
+		role: "read",db: "products"
+	},
+	{
+		role: "read",db: "sales"
+	}]
+}
+)
+
+--Create the administrative user with unrestricted access
+use admin
+db.createUser(
+{
+	user: "superuser",
+	pwd: "12345678",
+	roles: ["root"]
+}
+)
+
+Create a Role
+-------------
+-- Define the privileges to grant to the role
+	
+-- Check whether an existing role provides the privileges
+db.runCommand( { rolesInfo: 1, showPrivileges: 1 } )
+
+-- create role
+
+use admin
+db.auth("siteUserAdmin","password")
+db.createRole({
+	role: "myRole",
+	privileges: [{
+		resource: {
+			db: "reporting",
+			collection: ""
+		},
+		actions: ["find"]
+	}],
+	roles: [{
+		role: "read",
+		db: "reporting"
+	}]
+})
+
+------------
+use admin
+db.createRole(
+{
+	role: "myClusterwideAdmin",
+	privileges: [{
+		resource: {
+			cluster: true
+		},
+		actions: ["addShard"]
+	},
+	{
+		resource: {
+			db: "config",
+			collection: ""
+		},
+		actions: ["find","update","insert"]
+	},
+	{
+		resource: {
+			db: "users",
+			collection: "usersCollection"
+		},
+		actions: ["update"]
+	},
+	{
+		resource: {
+			db: "",
+			collection: ""
+		},
+		actions: ["find"]
+	}],
+	roles: [{
+		role: "read",
+		db: "admin"
+	}],
+	writeConcern: {
+		w: "majority",
+		wtimeout: 5000
+	}
+}
+)
+db.getRole( "myRole", { showPrivileges: true } )
+-- Grant a role to a user
+use admin
+db.grantRolesToUser(
+	"reportsUser",
+	[{
+		role: "myRole",
+		db: "reporting"
+	}]
+)
+
+-- Identify the user’s roles
+use reporting
+db.getUser("reportsUser")
+
+
+Modify the user’s access
+------------------------
+-- revoke a role
+use reporting
+db.revokeRolesFromUser(
+"reportsUser",
+	[{
+		role: "read",
+		db: "reporting"
+	}]
+)
+
+
+-- view roles in the current DB
+db.runCommand({ rolesInfo: "read" })
+-- view roles in other DB
+db.runCommand({ rolesInfo: { role: "myRole", db: "admin" } })
+
+-- view all custom roles
+db = db.getSiblingDB('admin')
+db.system.roles.find()
+
+-- Change the password
+db.changeUserPassword("reporting", "SOh3TbYhxuLiW8ypJPxmt1oOfL")
+
+-- drop all users
+db.dropAllUsers()
+
+-- drop a specific user
+db.dropUser("username")
+
+Built-in roles
+--------------
+read
+----
+Provides the ability to read data on all non-system collections and on the following system collections:
+system.indexes, system.js , and system.namespaces collections.
+Actions::
+collStats 
+dbStats 
+find 
+
+readWrite
+---------
+collStats 
+convertToCapped 
+createCollection 
+dbStats 
+dropCollection 
+createIndex 
+dropIndex 
+find 
+insert
+remove 
+update 
+
+dbAdmin
+-------
+Provides the following actions on the database’s system.indexes, system.namespaces , and system.profile collections:
+
+collStats
+dbHash 
+dbStats
+find 
+killCursors
+dropCollection on system.profile only
+
+Provides the following actions on all non-system collections. This role does not include full read access on
+non-system collections:
+collMod
+collStats 
+compact 
+convertToCapped 
+createCollection
+createIndex 
+dbStats 
+dropCollection
+dropDatabase 
+dropIndex 
+enableProfiler 
+indexStats 
+reIndex 
+renameCollectionSameDB 
+repairDatabase 
+storageDetails 
+validate
+
+dbOwner
+-------
+readWrite + dbAdmin + userAdmin
+
+userAdmin
+---------
+Provides the ability to create and modify roles and users on the current database.
+The userAdmin role explicitly provides the following actions:
+
+changeCustomData 
+changePassword 
+createRole 
+createUser 
+dropRole 
+dropUser 
+grantRole 
+revokeRole 
+viewRole 
+viewUser 
+
+readAnyDatabase
+---------------
+read + listDatabases
+
+readWriteAnyDatabase
+--------------------
+readWrite + listDatabases
+
+userAdminAnyDatabase
+--------------------
+userAdmin for all dbs + listDatabases
+
+dbAdminAnyDatabase
+------------------
+dbAdmin + listDatabases
+
+-- to any user any privilege
+• dbOwner role, when scoped to the admin database
+• userAdmin role, when scoped to the admin database
+• userAdminAnyDatabase role
+
+-- full privilege for all resources
+root
+----
+readWriteAnyDatabase + dbAdminAnyDatabase + userAdminAnyDatabase
+
+Sending MongoDB query result to a file
+--------------------------------------
+mongo localhost/mydb –eval "db.docs.count()" >> counttest.txt
+mongo localhost/mydb –eval "printjson(db.docs.count())" >> count.json
